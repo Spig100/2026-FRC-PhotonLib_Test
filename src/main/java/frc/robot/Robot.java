@@ -2,8 +2,18 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
+// This example is for PhotonVision & PhotonLib implement for robot code.
+
 package frc.robot;
 
+import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonPoseEstimator;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -18,6 +28,39 @@ public class Robot extends TimedRobot {
   private static final String kCustomAuto = "My Auto";
   private String m_autoSelected;
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+
+  /**
+   * 1. Basic setup for PhotonVision Camera
+   * 
+   * Note that for every single camera managed by PhotonVision, you need to specify different 
+   * cameraName for them regardless which coprocessor your cam is connected to. 
+   * 
+   * To setup the cameraName (nickname of your camera) in PhotonVision GUI, you need 
+   * to follow the instruction in this documentation: 
+   * https://docs.photonvision.org/en/latest/docs/quick-start/quick-configure.html#camera-nickname
+   * 
+   * We strongly suggest that you use the same name which set in the PhotonVision as your object 
+   * name.
+  */
+
+  PhotonCamera camera1 = new PhotonCamera("camera1");
+  PhotonCamera camera2 = new PhotonCamera("camera2");
+  
+  /**
+   * 2. AprilTag field layout setup
+   * 
+   * For testing more easily, we use the field layout of 2024-25 Reefscapes season.
+   */
+  
+  public static final AprilTagFieldLayout kTagLayout = 
+    AprilTagFieldLayout.loadField(AprilTagFields.k2025ReefscapeAndyMark);
+  
+  // You need to determine where your camera is onto the robot.
+  public static final Transform3d kRobotToCam = 
+    new Transform3d(new Translation3d(0.5, 0.0, 0.5), new Rotation3d(0, 0, 0));
+
+  PhotonPoseEstimator visionEst = new PhotonPoseEstimator(kTagLayout, kRobotToCam);
+
 
   /**
    * This function is run when the robot is first started up and should be used for any
